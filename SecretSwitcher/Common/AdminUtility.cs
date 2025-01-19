@@ -6,7 +6,6 @@ internal static class AdminUtility
 {
     public static bool IsUserAdmin()
     {
-        return true;
         try
         {
             var identity = WindowsIdentity.GetCurrent();

@@ -7,11 +7,11 @@ class Program
     static void Main(string[] args)
     {
         // Ensure user has administrative privileges
-        if (!AdminUtility.IsUserAdmin())
-        {
-            Console.WriteLine("This program requires administrative privileges. Please run it as an administrator.");
-            return;
-        }
+        // if (!AdminUtility.IsUserAdmin())
+        // {
+        //     Console.WriteLine("This program requires administrative privileges. Please run it as an administrator.");
+        //     return;
+        // }
 
         // Load base address configuration from the environment file
         string? baseAddress = ConfigManager.LoadBaseAddress();

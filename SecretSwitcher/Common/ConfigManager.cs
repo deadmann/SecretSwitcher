@@ -22,6 +22,27 @@ internal static class ConfigManager
         return null;
     }
 
+    // Retrieves a key specific to the environment or defaults if not found
+    public static string? GetDataConfigValue(string key, string? environment = null)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            throw new ArgumentException("Key cannot be null or empty.", nameof(key));
+        }
+
+        // Generate environment-specific key if environment is provided
+        if (!string.IsNullOrWhiteSpace(environment))
+        {
+            var envSpecificKey = $"DATA_{environment}__{key}";
+            var envValue = GetConfigValue(envSpecificKey);
+            if (envValue != null) return envValue;
+        }
+
+        // Fallback to the default key
+        var defaultKey = $"DATA__{key}";
+        return GetConfigValue(defaultKey);
+    }
+    
     // Retrieves the BaseAddress from the .env configuration
     public static string? LoadBaseAddress() => GetConfigValue("SWITCHER_BASE_ADDRESS");
 

@@ -1,4 +1,5 @@
 ﻿using SecretSwitcher.Common;
+using SecretSwitcher.Common.Extensions;
 using SecretSwitcher.Data;
 
 namespace SecretSwitcher.SwitchEnvironment;
@@ -46,6 +47,10 @@ internal static class SwitchEnvironmentCommandOperations
                 {
                     Console.WriteLine($"  Database: Secret exists in the database for Environment '{environment}'.");
 
+                    // Replace placeholders with actual values
+                    var processedContent = secretsInDb.Content
+                        .ReplacePlaceholdersWithValues(environment);
+                    
                     // Replace the file content with content from the database
                     try
                     {
@@ -61,7 +66,7 @@ internal static class SwitchEnvironmentCommandOperations
                         using (var fileStream = new FileStream(secretFile, FileMode.Create, FileAccess.Write, FileShare.None))
                         using (var writer = new StreamWriter(fileStream))
                         {
-                            writer.Write(secretsInDb.Content);
+                            writer.Write(processedContent);
                         }
 
                         Console.WriteLine($"  Secrets updated: File replaced with content from the database for '{project.Name}'.");
