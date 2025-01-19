@@ -4,6 +4,11 @@ namespace SecretSwitcher.Common;
 
 internal static class ProjectManager
 {
+    /// <summary>
+    /// Does not Traverse `Class Libraries` or `Test` projects
+    /// </summary>
+    /// <param name="baseAddress"></param>
+    /// <returns></returns>
     public static List<ProjectInfo> TraverseProjectsAndRetrieveSecrets(string baseAddress)
     {
         var projectInfos = new List<ProjectInfo>();
@@ -25,7 +30,43 @@ internal static class ProjectManager
                 projectInfos.Add(new ProjectInfo
                 {
                     Name = projectName,
-                    SecretId = secretId
+                    SecretId = secretId,
+                    ProjectType = projectType
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error traversing directories: {ex.Message}");
+        }
+
+        return projectInfos;
+    }
+    
+    /// <summary>
+    /// Retrieve all projects regardless of their types
+    /// </summary>
+    /// <param name="baseAddress"></param>
+    /// <returns></returns>
+    public static List<ProjectInfo> TraverseAllProjects(string baseAddress)
+    {
+        var projectInfos = new List<ProjectInfo>();
+
+        try
+        {
+            foreach (string filePath in Directory.EnumerateFiles(baseAddress, "*.csproj", SearchOption.AllDirectories))
+            {
+                string projectName = Path.GetFileNameWithoutExtension(filePath);
+
+                // Determine the project type but do not filter
+                var projectType = DetermineProjectType(filePath);
+                    
+                string? secretId = GetUserSecretsIdFromProject(filePath);
+                projectInfos.Add(new ProjectInfo
+                {
+                    Name = projectName,
+                    SecretId = secretId,
+                    ProjectType = projectType // Track ProjectType for future logic
                 });
             }
         }
@@ -98,7 +139,7 @@ internal static class ProjectManager
 
 internal enum ProjectType
 {
-    Executable,
+    Executable = 1,
     WebApp,
     ClassLibrary,
     Test
@@ -108,4 +149,5 @@ internal class ProjectInfo
 {
     public string Name { get; set; } = null!;
     public string? SecretId { get; set; }
+    public ProjectType ProjectType { get; set; }
 }

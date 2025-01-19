@@ -1,7 +1,9 @@
 ﻿using SecretSwitcher.Common;
 using SecretSwitcher.GenerateEmptyMongoSecrets;
 using SecretSwitcher.GenerateMongoSecrets;
+using SecretSwitcher.GetDbSecretsInClipboard;
 using SecretSwitcher.RemoveSecretsByEnvironment;
+using SecretSwitcher.SetDbSecretsFromClipboard;
 using SecretSwitcher.SwitchEnvironment;
 
 namespace SecretSwitcher;
@@ -9,16 +11,20 @@ namespace SecretSwitcher;
 internal static class CommandRegistry
 {
     public const string SwitchEnvironment = "switch";
+    public const string GetSecretInClipboard = "getclip";
+    public const string SetSecretFromClipboard = "setclip";
     public const string GenerateCurrentMongoSecrets = "gcms";
     public const string GenerateEmptyMongoSecrets = "gems";
     public const string RemoveSecrets = "remove";
-    
+
     private static readonly Dictionary<string, (object Command, Type RequestType)> CommandDictionary = new()
     {
         { SwitchEnvironment, (new SwitchEnvironmentCommand(), typeof(SwitchEnvironmentRequest)) },
+        { GetSecretInClipboard, (new GetSecretsCommand(), typeof(GetSecretsRequest)) },
+        { SetSecretFromClipboard, (new SetSecretsCommand(), typeof(SetSecretsRequest)) },
         { GenerateCurrentMongoSecrets, (new GenerateCurrentMongoSecretsCommand(), typeof(GenerateCurrentMongoSecretsRequest)) },
         { GenerateEmptyMongoSecrets, (new GenerateEmptyMongoSecretsCommand(), typeof(GenerateEmptyMongoSecretsRequest)) },
-        { RemoveSecrets, (new RemoveSecretsByEnvironmentCommand(), typeof(RemoveSecretsByEnvironmentRequest))}
+        { RemoveSecrets, (new RemoveSecretsByEnvironmentCommand(), typeof(RemoveSecretsByEnvironmentRequest)) }
     };
 
     public static (object Command, object Request)? GetCommandWithRequest(
@@ -45,6 +51,20 @@ internal static class CommandRegistry
                 {
                     BaseAddress = baseAddress, 
                     Environment = args.Length > 0 ? args[0] : null
+                },
+            GetSecretInClipboard when requestType == typeof(GetSecretsRequest) =>
+                new GetSecretsRequest
+                {
+                    BaseAddress = baseAddress,
+                    Environment = args.Length > 0 ? args[0] : null,
+                    ProjectName = args.Length > 1 ? args[1] : null
+                },
+            SetSecretFromClipboard when requestType == typeof(SetSecretsRequest) =>
+                new SetSecretsRequest
+                {
+                    BaseAddress = baseAddress,
+                    Environment = args.Length > 0 ? args[0] : null,
+                    ProjectName = args.Length > 1 ? args[1] : null
                 },
             GenerateCurrentMongoSecrets when requestType == typeof(GenerateCurrentMongoSecretsRequest) =>
                 new GenerateCurrentMongoSecretsRequest
