@@ -2,7 +2,7 @@
 
 internal static class ConfigManager
 {
-    private const string ConfigFilePath = ".env";
+    private static readonly string ConfigFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".env");
 
     // Loads a key-value pair from the .env file
     private static string? GetConfigValue(string key)
