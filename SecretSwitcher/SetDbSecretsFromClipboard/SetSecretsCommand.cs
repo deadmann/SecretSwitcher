@@ -92,7 +92,7 @@ public class SetSecretsCommand : ICommand<SetSecretsRequest>
             Console.WriteLine("Project type is neither Executable nor WebApp. Operation cannot be processed.");
             return;
         }
-        
+
         var clipboardContent = await GetClipboardContent();
 
         if (string.IsNullOrEmpty(clipboardContent))
@@ -100,12 +100,13 @@ public class SetSecretsCommand : ICommand<SetSecretsRequest>
             Console.WriteLine("Clipboard content is empty.");
             return;
         }
-        
+
         Console.WriteLine("Content Found in the Clipboard:");
         ColorHelper.PrintInfo(clipboardContent);
-        
+
         Console.WriteLine($"You are about to set secrets for the environment '{request.Environment}'.");
-        if (AskConfirmation("Do you want to override the existing data?"))
+        if (AskConfirmation(
+                $"Do you want to override the existing data? ({CharacterMap.Underline.Place}Y{CharacterMap.Underline.Reset}es/{CharacterMap.Underline.Place}N{CharacterMap.Underline.Reset}o)"))
         {
             // Console.WriteLine("===> Replacing the old content with new clipboard data (place a placeholder for comparison).");
             await SetSecretsInDb(project, request.Environment!, clipboardContent);
